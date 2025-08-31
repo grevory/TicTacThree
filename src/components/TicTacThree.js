@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-const StrategyTicTacToe = () => {
+const TicTacThree = () => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [currentPlayer, setCurrentPlayer] = useState('X');
   const [gameHistory, setGameHistory] = useState({ X: [], O: [] });
@@ -38,27 +38,27 @@ const StrategyTicTacToe = () => {
     if (mustMove) {
       // Player must move their oldest piece
       if (newBoard[index] !== null) return; // Can't move to occupied square
-      
+
       const oldestMove = history[currentPlayer][0];
       if (oldestMove === undefined) return;
-      
+
       // Remove from old position
       newBoard[oldestMove.position] = null;
       // Place in new position
       newBoard[index] = currentPlayer;
-      
+
       // Update history - remove oldest and add new move
       history[currentPlayer] = [
         ...history[currentPlayer].slice(1),
         { position: index, timestamp: Date.now() }
       ];
-      
+
       setMustMove(false);
       setHighlightedSquare(null);
     } else {
       // Normal placement
       if (newBoard[index] !== null) return; // Square already occupied
-      
+
       newBoard[index] = currentPlayer;
       history[currentPlayer].push({ position: index, timestamp: Date.now() });
     }
@@ -85,13 +85,13 @@ const StrategyTicTacToe = () => {
 
     // Switch players
     const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    
+
     // Check if next player needs to move a piece (has 3 pieces on board)
     if (history[nextPlayer].length === 3) {
       setMustMove(true);
       setHighlightedSquare(history[nextPlayer][0].position);
     }
-    
+
     setCurrentPlayer(nextPlayer);
   }, [board, currentPlayer, gameHistory, winner, isDraw, mustMove, checkWinner, checkDraw]);
 
@@ -213,4 +213,4 @@ const StrategyTicTacToe = () => {
   );
 };
 
-export default StrategyTicTacToe;
+export default TicTacThree;

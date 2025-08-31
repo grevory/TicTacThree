@@ -6,7 +6,7 @@ A strategic variation of tic-tac-toe where each player can only have 3 pieces on
 
 ```bash
 # Clone the repository
-git clone https://github.com/grevory/tic-tac-three.git
+git clone https://github.com/grevory/TicTacThree.git
 cd tic-tac-three
 
 # Install dependencies
