@@ -1,5 +1,5 @@
 {
-	"name": "tictacthree",
+	"name": "Tic Tac Three",
 	"description": "A strategic variation of tic-tac-toe where each player can only have 3 pieces on the board, and must move their oldest piece when placing new ones.",
 	"version": "0.1.0",
 	"homepage": "https://grevory.github.io/TicTacThree",

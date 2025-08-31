@@ -105,11 +105,31 @@ const TicTacThree = () => {
     setHighlightedSquare(null);
   };
 
-  const getSquareStyle = (index) => {
-    const baseStyle = "w-20 h-20 sm:w-24 sm:h-24 border-4 border-purple-600 flex items-center justify-center text-4xl sm:text-5xl font-bold cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95";
+  const getNextMovePosition = (player) => {
+    if (gameHistory[player].length === 3 && !winner && !isDraw) {
+      return gameHistory[player][0]?.position ?? null;
+    }
+    return null;
+  };
 
+  const getSquareStyle = (index) => {
+    const baseStyle = "w-20 h-20 sm:w-24 sm:h-24 border-4 border-purple-600 flex items-center justify-center text-4xl sm:text-5xl font-bold cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 relative";
+
+    // Active move highlight (current player must move this piece)
     if (highlightedSquare === index) {
-      return `${baseStyle} bg-yellow-300 animate-pulse shadow-lg`;
+      return `${baseStyle} bg-yellow-300 animate-pulse shadow-lg ring-4 ring-yellow-400`;
+    }
+
+    // Next move glow for both teams
+    const xNextMove = getNextMovePosition('X');
+    const oNextMove = getNextMovePosition('O');
+    
+    if (xNextMove === index) {
+      return `${baseStyle} bg-white hover:bg-purple-50 shadow-md ring-2 ring-emerald-400 shadow-emerald-400/50`;
+    }
+    
+    if (oNextMove === index) {
+      return `${baseStyle} bg-white hover:bg-purple-50 shadow-md ring-2 ring-pink-400 shadow-pink-400/50`;
     }
 
     return `${baseStyle} bg-white hover:bg-purple-50 shadow-md`;
@@ -137,7 +157,9 @@ const TicTacThree = () => {
     }
     if (mustMove) {
       const oldestPosition = highlightedSquare;
-      return `Player ${currentPlayer} must move their piece from position ${oldestPosition + 1}`;
+      return oldestPosition !== null
+        ? `Player ${currentPlayer} must move their piece from position ${oldestPosition + 1}`
+        : `Player ${currentPlayer} must move a piece`;
     }
     return `Player ${currentPlayer}'s turn (${getCurrentPlayerCount()}/3 pieces placed)`;
   };
@@ -147,7 +169,7 @@ const TicTacThree = () => {
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Strategic Tic-Tac-Toe
+            Tic Tac Three
           </h1>
           <p className="text-gray-600 text-sm mb-4">
             Each player can only have 3 pieces. When all 3 are placed, you must move your oldest piece!
@@ -167,22 +189,64 @@ const TicTacThree = () => {
               <span className={getPlayerStyle(square)}>
                 {square}
               </span>
+              {highlightedSquare === index && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-bounce">
+                  !
+                </div>
+              )}
+              {/* Next move indicators */}
+              {getNextMovePosition('X') === index && !mustMove && (
+                <div className="absolute -top-1 -left-1 bg-emerald-400 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  1
+                </div>
+              )}
+              {getNextMovePosition('O') === index && !mustMove && (
+                <div className="absolute -top-1 -left-1 bg-pink-400 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  1
+                </div>
+              )}
             </div>
           ))}
         </div>
 
         <div className="flex justify-between items-center mb-6">
           <div className="text-center">
-            <div className="text-emerald-500 font-bold text-xl mb-1">Player X</div>
+            <div className="text-emerald-500 font-bold text-xl mb-1 flex items-center justify-center gap-2">
+              Player X
+              {mustMove && currentPlayer === 'X' && (
+                <div className="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
+                  !
+                </div>
+              )}
+            </div>
             <div className="text-sm text-gray-600">
               {gameHistory.X.length}/3 pieces
             </div>
+            {getNextMovePosition('X') !== null && !winner && !isDraw && (
+              <div className="text-xs text-emerald-600 font-medium mt-1 flex items-center justify-center gap-1">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                Next to move: #{getNextMovePosition('X') + 1}
+              </div>
+            )}
           </div>
           <div className="text-center">
-            <div className="text-pink-500 font-bold text-xl mb-1">Player O</div>
+            <div className="text-pink-500 font-bold text-xl mb-1 flex items-center justify-center gap-2">
+              Player O
+              {mustMove && currentPlayer === 'O' && (
+                <div className="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
+                  !
+                </div>
+              )}
+            </div>
             <div className="text-sm text-gray-600">
               {gameHistory.O.length}/3 pieces
             </div>
+            {getNextMovePosition('O') !== null && !winner && !isDraw && (
+              <div className="text-xs text-pink-600 font-medium mt-1 flex items-center justify-center gap-1">
+                <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></span>
+                Next to move: #{getNextMovePosition('O') + 1}
+              </div>
+            )}
           </div>
         </div>
 
@@ -207,6 +271,8 @@ const TicTacThree = () => {
         <div className="mt-6 text-xs text-gray-500 text-center">
           <p className="mb-1">💡 Strategy Tip: Plan which piece you'll need to move next!</p>
           <p>Watch your opponent's oldest pieces to predict their moves.</p>
+          <p className="mt-2 text-emerald-600">🟢 Emerald glow = X's next move</p>
+          <p className="text-pink-600">🔴 Pink glow = O's next move</p>
         </div>
       </div>
     </div>
